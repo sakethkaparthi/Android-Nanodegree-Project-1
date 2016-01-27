@@ -10,8 +10,6 @@
     android:verticalSpacing="10dp"
     android:horizontalSpacing="10dp"
     android:stretchMode="columnWidth"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp"
     android:gravity="center"
     tools:context="sakethkaparthi.moviesapp.MovieListActivity">
 

@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
@@ -17,36 +16,35 @@ import java.util.ArrayList;
  */
 public class MovieAdapter extends BaseAdapter {
     private Context mContext;
-    private ArrayList<String > movieNames, posterLinks;
-    public MovieAdapter(Context mContext, ArrayList<String> names, ArrayList<String> images){
+    private ArrayList<Movie> movieArrayList;
+
+    public MovieAdapter(Context mContext, ArrayList<Movie> movieArrayList) {
         this.mContext = mContext;
-        movieNames = names;
-        posterLinks = images;
-    }
-    @Override
-    public int getCount() {
-        return movieNames.size();
+        this.movieArrayList = movieArrayList;
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public int getCount() {
+        return movieArrayList.size();
+    }
+
+    @Override
+    public Movie getItem(int position) {
+        return movieArrayList.get(position);
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;
+        return movieArrayList.get(position).getId();
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if(convertView == null){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item,parent,false);
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item, parent, false);
         }
-        ImageView imageView  = (ImageView)convertView.findViewById(R.id.movie_poster);
-        TextView textView = (TextView)convertView.findViewById(R.id.movie_title);
-        Picasso.with(mContext).load(posterLinks.get(position)).into(imageView);
-        textView.setText(movieNames.get(position));
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.movie_poster);
+        Picasso.with(mContext).load(Constants.IMAGE_BASE_URL+movieArrayList.get(position).getPosterPath()).into(imageView);
         return convertView;
     }
 }
