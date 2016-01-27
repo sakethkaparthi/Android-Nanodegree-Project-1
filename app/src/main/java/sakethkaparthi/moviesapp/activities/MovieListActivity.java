@@ -1,12 +1,15 @@
 package sakethkaparthi.moviesapp.activities;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import java.util.ArrayList;
@@ -67,6 +70,13 @@ public class MovieListActivity extends AppCompatActivity {
                 movieAdapter = new MovieAdapter(getApplicationContext(), movies);
                 gridview.setAdapter(movieAdapter);
                 movieAdapter.notifyDataSetChanged();
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        MovieDetailsActivity.movie = movieAdapter.getItem(position);
+                        startActivity(new Intent(MovieListActivity.this,MovieDetailsActivity.class));
+                    }
+                });
             }
 
             @Override
