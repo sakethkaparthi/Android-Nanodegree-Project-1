@@ -1,4 +1,4 @@
-package sakethkaparthi.moviesapp;
+package sakethkaparthi.moviesapp.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,10 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import sakethkaparthi.moviesapp.models.Movie;
+import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.resources.Constants;
 
 /**
  * Created by saketh on 27/1/16.

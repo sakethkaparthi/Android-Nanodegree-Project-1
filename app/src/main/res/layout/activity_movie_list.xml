@@ -9,6 +9,6 @@
     android:numColumns="auto_fit"
     android:stretchMode="columnWidth"
     android:gravity="center"
-    tools:context="sakethkaparthi.moviesapp.MovieListActivity">
+    tools:context=".activities.MovieListActivity">
 
 </GridView>

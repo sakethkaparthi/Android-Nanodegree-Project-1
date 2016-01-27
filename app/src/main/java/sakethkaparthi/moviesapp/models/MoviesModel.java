@@ -1,10 +1,12 @@
-package sakethkaparthi.moviesapp;
+package sakethkaparthi.moviesapp.models;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import sakethkaparthi.moviesapp.models.Movie;
 
 /**
  * Created by saketh on 27/1/16.

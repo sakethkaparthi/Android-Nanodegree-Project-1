@@ -1,4 +1,4 @@
-package sakethkaparthi.moviesapp;
+package sakethkaparthi.moviesapp.resources;
 
 /**
  * Created by saketh on 27/1/16.

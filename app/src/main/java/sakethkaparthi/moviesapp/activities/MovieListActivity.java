@@ -1,4 +1,4 @@
-package sakethkaparthi.moviesapp;
+package sakethkaparthi.moviesapp.activities;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -14,6 +14,11 @@ import java.util.ArrayList;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+import sakethkaparthi.moviesapp.models.Movie;
+import sakethkaparthi.moviesapp.adapters.MovieAdapter;
+import sakethkaparthi.moviesapp.models.MoviesModel;
+import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.network.APIClient;
 
 public class MovieListActivity extends AppCompatActivity {
     MovieAdapter movieAdapter;

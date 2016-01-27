@@ -1,8 +1,10 @@
-package sakethkaparthi.moviesapp;
+package sakethkaparthi.moviesapp.network;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.http.GET;
+import sakethkaparthi.moviesapp.resources.Constants;
+import sakethkaparthi.moviesapp.models.MoviesModel;
 
 /**
  * Created by saketh on 27/1/16.
