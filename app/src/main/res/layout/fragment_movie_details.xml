@@ -49,13 +49,25 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorPrimary"
                 tools:text="8.5" />
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/reviews_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reviews"
+                android:textColor="#fff"
+                android:padding="10dp"
+                android:drawableRight="@drawable/ic_arrow_forward"
+                android:drawablePadding="10dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="20dp"
+                android:background="@color/colorPrimary"/>
         </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Plot synopsis"
+        android:text="@string/plot_synopsis"
         android:textColor="#000"
         android:textStyle="bold"
         android:layout_marginTop="10dp"
@@ -68,9 +80,13 @@
         android:layout_height="wrap_content"
         android:textColor="#000"
         android:textSize="14sp" />
-    <!-- <View
+     <View
          android:layout_width="match_parent"
          android:layout_height="0.3dp"
          android:background="#90000000"
-         />-->
+         />
+    <ListView
+        android:id="@+id/trailers_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

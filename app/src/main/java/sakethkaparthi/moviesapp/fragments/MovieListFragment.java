@@ -1,14 +1,17 @@
-package sakethkaparthi.moviesapp.activities;
+package sakethkaparthi.moviesapp.fragments;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
@@ -17,22 +20,28 @@ import java.util.ArrayList;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import sakethkaparthi.moviesapp.models.Movie;
-import sakethkaparthi.moviesapp.adapters.MovieAdapter;
-import sakethkaparthi.moviesapp.models.MoviesModel;
 import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.adapters.MovieAdapter;
+import sakethkaparthi.moviesapp.models.Movie;
+import sakethkaparthi.moviesapp.models.MoviesModel;
 import sakethkaparthi.moviesapp.network.APIClient;
 
-public class MovieListActivity extends AppCompatActivity {
+public class MovieListFragment extends Fragment {
     MovieAdapter movieAdapter;
     ProgressDialog progressDialog;
     GridView gridview;
 
+    public static MovieListFragment newInstance() {
+
+
+        MovieListFragment fragment = new MovieListFragment();
+        return fragment;
+    }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.sort_menu, menu);
-        return true;
     }
 
     @Override
@@ -48,12 +57,17 @@ public class MovieListActivity extends AppCompatActivity {
         }
     }
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_movie_list);
-        gridview = (GridView) findViewById(R.id.grid_view);
-        progressDialog = new ProgressDialog(this);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_movie_list, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        gridview = (GridView) view.findViewById(R.id.grid_view);
+        progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(true);
         progressDialog.show();
@@ -67,14 +81,19 @@ public class MovieListActivity extends AppCompatActivity {
                 progressDialog.dismiss();
                 ArrayList<Movie> movies = new ArrayList<Movie>();
                 movies.addAll(moviesModel.getResults());
-                movieAdapter = new MovieAdapter(getApplicationContext(), movies);
+                movieAdapter = new MovieAdapter(getContext(), movies);
                 gridview.setAdapter(movieAdapter);
                 movieAdapter.notifyDataSetChanged();
                 gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        MovieDetailsActivity.movie = movieAdapter.getItem(position);
-                        startActivity(new Intent(MovieListActivity.this,MovieDetailsActivity.class));
+                        MovieDetailsFragment.movie = movieAdapter.getItem(position);
+
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                        fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
                     }
                 });
             }
@@ -96,7 +115,7 @@ public class MovieListActivity extends AppCompatActivity {
                 ArrayList<Movie> movies = new ArrayList<Movie>();
                 movies.addAll(moviesModel.getResults());
                 Log.d("apicall", movies.size() + "");
-                movieAdapter = new MovieAdapter(getApplicationContext(), movies);
+                movieAdapter = new MovieAdapter(getContext(), movies);
                 gridview.setAdapter(movieAdapter);
                 movieAdapter.notifyDataSetChanged();
             }
