@@ -4,9 +4,11 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import sakethkaparthi.moviesapp.R;
 import sakethkaparthi.moviesapp.models.Review;
 
 /**
@@ -37,8 +39,11 @@ public class ReviewsAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if(convertView==null){
-
+                convertView = mActivity.getLayoutInflater().inflate(R.layout.review_list_item,parent,false);
         }
-        return null;
+        ((TextView)convertView.findViewById(R.id.review_content)).setText(getItem(position).getContent().substring(0,100)
+        +"...Click here to see more");
+        ((TextView)convertView.findViewById(R.id.review_author)).setText(getItem(position).getAuthor());
+        return convertView;
     }
 }

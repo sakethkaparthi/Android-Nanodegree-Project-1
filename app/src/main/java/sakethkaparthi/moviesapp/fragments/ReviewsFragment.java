@@ -1,26 +1,46 @@
 package sakethkaparthi.moviesapp.fragments;
 
 
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.activities.ContainerActivity;
+import sakethkaparthi.moviesapp.adapters.ReviewsAdapter;
+import sakethkaparthi.moviesapp.models.Review;
+import sakethkaparthi.moviesapp.models.ReviewsModel;
+import sakethkaparthi.moviesapp.network.APIClient;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class ReviewsFragment extends Fragment {
     ListView listView;
+    public static String id;
 
     public ReviewsFragment() {
         // Required empty public constructor
     }
 
+    public static ReviewsFragment newInstance(String id) {
+        ReviewsFragment fragment = new ReviewsFragment();
+        fragment.id = id;
+        return fragment;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,6 +52,38 @@ public class ReviewsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        listView = (ListView)view.findViewById(R.id.reviews_list);
+        listView = (ListView) view.findViewById(R.id.reviews_list);
+        final ProgressDialog progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage("Loading...");
+        progressDialog.show();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
+        APIClient.getAPI().getMovieReviews(id, new Callback<ReviewsModel>() {
+            @Override
+            public void success(final ReviewsModel reviewsModel, Response response) {
+                ArrayList<Review> reviews = new ArrayList<Review>();
+                reviews.addAll(reviewsModel.getResults());
+                final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), reviews);
+                listView.setAdapter(reviewsAdapter);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        startActivity(new Intent(Intent.ACTION_VIEW,
+                                Uri.parse(reviewsAdapter.getItem(position).getUrl())));
+                    }
+                });
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                progressDialog.dismiss();
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
     }
 }

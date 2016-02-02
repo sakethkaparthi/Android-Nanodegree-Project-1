@@ -21,6 +21,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.activities.ContainerActivity;
 import sakethkaparthi.moviesapp.adapters.MovieAdapter;
 import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.models.MoviesModel;
@@ -71,6 +72,7 @@ public class MovieListFragment extends Fragment {
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(true);
         progressDialog.show();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
         sortByPopular();
     }
 
@@ -88,7 +90,6 @@ public class MovieListFragment extends Fragment {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         MovieDetailsFragment.movie = movieAdapter.getItem(position);
-
                         FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                         fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
                         fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
@@ -126,5 +127,11 @@ public class MovieListFragment extends Fragment {
                 error.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movies");
     }
 }

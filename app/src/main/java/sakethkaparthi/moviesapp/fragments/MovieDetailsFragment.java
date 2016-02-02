@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.activities.ContainerActivity;
 import sakethkaparthi.moviesapp.adapters.TrailersAdapter;
 import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.models.Trailer;
@@ -53,11 +56,13 @@ public class MovieDetailsFragment extends Fragment {
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
         progressDialog.show();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
         ImageView posterImageView = (ImageView) view.findViewById(R.id.movie_poster);
         TextView movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
         TextView movieRatingTextView = (TextView) view.findViewById(R.id.rating_text_view);
         TextView movieReleaseTextView = (TextView) view.findViewById(R.id.release_date_text_view);
         TextView movieSynopsisTextView = (TextView) view.findViewById(R.id.plot_synopsis_text_view);
+        AppCompatButton appCompatButton = (AppCompatButton) view.findViewById(R.id.reviews_button);
         trailersList = (ListView) view.findViewById(R.id.trailers_list_view);
         Picasso.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
                 .into(posterImageView);
@@ -65,6 +70,16 @@ public class MovieDetailsFragment extends Fragment {
         movieRatingTextView.setText(movie.getVoteAverage() + "");
         movieReleaseTextView.setText(movie.getReleaseDate());
         movieSynopsisTextView.setText(movie.getOverview());
+        appCompatButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId()+""),"Reviews");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
         APIClient.getAPI().getMovieTrailers(movie.getId() + "", new Callback<TrailersModel>() {
             @Override
             public void success(TrailersModel trailersModel, Response response) {
@@ -91,4 +106,9 @@ public class MovieDetailsFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
+    }
 }
