@@ -14,6 +14,8 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import java.util.HashMap;
+
 /**
  * Created by saketh on 16/3/16.
  */
@@ -32,6 +34,7 @@ public class MoviesProvider extends ContentProvider {
     static final int movies = 1;
     static final int movies_ID = 2;
     static final UriMatcher uriMatcher;
+    private static HashMap<String, String> MOVIES_PROJECTION_MAP;
 
     static {
         uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -89,6 +92,9 @@ public class MoviesProvider extends ContentProvider {
         qb.setTables(MOVIES_TABLE_NAME);
 
         switch (uriMatcher.match(uri)) {
+            case movies:
+                qb.setProjectionMap(MOVIES_PROJECTION_MAP);
+                break;
             case movies_ID:
                 qb.appendWhere(_ID + "=" + uri.getPathSegments().get(1));
                 break;

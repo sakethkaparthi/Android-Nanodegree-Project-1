@@ -1,6 +1,7 @@
 package sakethkaparthi.moviesapp.fragments;
 
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import sakethkaparthi.moviesapp.models.Trailer;
 import sakethkaparthi.moviesapp.models.TrailersModel;
 import sakethkaparthi.moviesapp.network.APIClient;
 import sakethkaparthi.moviesapp.resources.Constants;
+import sakethkaparthi.moviesapp.database.MoviesProvider;
 
 public class MovieDetailsFragment extends Fragment {
     public static Movie movie;
@@ -58,10 +60,23 @@ public class MovieDetailsFragment extends Fragment {
         progressDialog.show();
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
         ImageView posterImageView = (ImageView) view.findViewById(R.id.movie_poster);
+        ImageView favouriteImageView = (ImageView) view.findViewById(R.id.favourite_image);
         TextView movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
         TextView movieRatingTextView = (TextView) view.findViewById(R.id.rating_text_view);
         TextView movieReleaseTextView = (TextView) view.findViewById(R.id.release_date_text_view);
         TextView movieSynopsisTextView = (TextView) view.findViewById(R.id.plot_synopsis_text_view);
+        favouriteImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ContentValues values = new ContentValues();
+                values.put(MoviesProvider.NAME, movie.getTitle());
+                values.put(MoviesProvider.POSTER, movie.getPosterPath());
+                values.put(MoviesProvider.SYNOPSIS, movie.getOverview());
+                values.put(MoviesProvider.RELEASE_DATE, movie.getReleaseDate());
+                values.put(MoviesProvider.RATING, movie.getVoteAverage() + "");
+                getActivity().getContentResolver().insert(MoviesProvider.CONTENT_URI, values);
+            }
+        });
         AppCompatButton appCompatButton = (AppCompatButton) view.findViewById(R.id.reviews_button);
         trailersList = (ListView) view.findViewById(R.id.trailers_list_view);
         Picasso.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
@@ -75,7 +90,7 @@ public class MovieDetailsFragment extends Fragment {
             public void onClick(View v) {
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId()+""),"Reviews");
+                fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }

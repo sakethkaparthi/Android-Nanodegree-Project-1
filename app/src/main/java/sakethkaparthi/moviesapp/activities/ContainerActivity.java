@@ -28,7 +28,7 @@ public class ContainerActivity extends AppCompatActivity {
                 "Death note");
 
         values.put(MoviesProvider.POSTER,
-                "http://www.google.com");
+                "http://s3.amazonaws.com/viz-test/products/deathnote_s1v1.jpg");
         values.put(MoviesProvider.RATING,
                 "5.0");
         values.put(MoviesProvider.SYNOPSIS,

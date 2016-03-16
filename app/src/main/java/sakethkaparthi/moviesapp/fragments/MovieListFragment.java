@@ -1,6 +1,7 @@
 package sakethkaparthi.moviesapp.fragments;
 
 import android.app.ProgressDialog;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,7 +23,9 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 import sakethkaparthi.moviesapp.R;
 import sakethkaparthi.moviesapp.activities.ContainerActivity;
+import sakethkaparthi.moviesapp.adapters.FavouritesCursorAdapter;
 import sakethkaparthi.moviesapp.adapters.MovieAdapter;
+import sakethkaparthi.moviesapp.database.MoviesProvider;
 import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.models.MoviesModel;
 import sakethkaparthi.moviesapp.network.APIClient;
@@ -53,14 +56,19 @@ public class MovieListFragment extends Fragment {
         } else if (item.getItemId() == R.id.sort_by_ratings) {
             sortByRatings();
             return true;
+        } else if (item.getItemId() == R.id.favourites) {
+            showFavourites();
+            return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
     }
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_movie_list, container, false);
     }
 
@@ -127,6 +135,12 @@ public class MovieListFragment extends Fragment {
                 error.printStackTrace();
             }
         });
+    }
+
+    void showFavourites() {
+        Cursor query = getActivity().getContentResolver().query(MoviesProvider.CONTENT_URI, null, null, null, null);
+        FavouritesCursorAdapter cursorAdapter = new FavouritesCursorAdapter(getActivity(), query, 0);
+        gridview.setAdapter(cursorAdapter);
     }
 
     @Override
