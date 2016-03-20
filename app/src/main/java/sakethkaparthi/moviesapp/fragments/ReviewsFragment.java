@@ -75,6 +75,8 @@ public class ReviewsFragment extends Fragment {
                         }
                     });
                     progressDialog.dismiss();
+                    if (reviews.isEmpty())
+                        Toast.makeText(getContext(), "This movie has no reviews", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override

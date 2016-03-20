@@ -72,14 +72,25 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_share) {
-            if (Potato.potate(getContext()).Utils().isInternetConnected()) {
-                Toast.makeText(getContext(), "Share the first Trailer!", Toast.LENGTH_SHORT).show();
-                String url = Constants.YOUTUBE_BASE + adapter.getItem(0).getKey();
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, url);
-                sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+            if (movie != null) {
+                if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+                    try {
+                        String url = Constants.YOUTUBE_BASE + adapter.getItem(0).getKey();
+                        Toast.makeText(getContext(), "Share the first Trailer!", Toast.LENGTH_SHORT).show();
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, url);
+                        sendIntent.setType("text/plain");
+                        startActivity(sendIntent);
+                    } catch (IndexOutOfBoundsException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "This movie has no trailers", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Please connect to the internet to get trailers", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(getContext(), "Please select a movie first", Toast.LENGTH_SHORT).show();
             }
         }
         return super.onOptionsItemSelected(item);
