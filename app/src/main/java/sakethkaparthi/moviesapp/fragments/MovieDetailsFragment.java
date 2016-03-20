@@ -3,6 +3,7 @@ package sakethkaparthi.moviesapp.fragments;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,34 +11,40 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.AppCompatButton;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import chipset.potato.Potato;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 import sakethkaparthi.moviesapp.R;
 import sakethkaparthi.moviesapp.activities.ContainerActivity;
 import sakethkaparthi.moviesapp.adapters.TrailersAdapter;
+import sakethkaparthi.moviesapp.database.MoviesProvider;
 import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.models.Trailer;
 import sakethkaparthi.moviesapp.models.TrailersModel;
 import sakethkaparthi.moviesapp.network.APIClient;
 import sakethkaparthi.moviesapp.resources.Constants;
-import sakethkaparthi.moviesapp.database.MoviesProvider;
 
 public class MovieDetailsFragment extends Fragment {
     public static Movie movie;
     ListView trailersList;
     TrailersAdapter adapter;
+    boolean favourite = false;
 
     public static MovieDetailsFragment newInstance() {
 
@@ -49,7 +56,30 @@ public class MovieDetailsFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         return inflater.inflate(R.layout.fragment_movie_details, container, false);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.movie_details_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_share) {
+            if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+                Toast.makeText(getContext(), "Share the first Trailer!", Toast.LENGTH_SHORT).show();
+                String url = Constants.YOUTUBE_BASE + adapter.getItem(0).getKey();
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, url);
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -57,29 +87,46 @@ public class MovieDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
-        progressDialog.show();
-        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
+        if (((ContainerActivity) getActivity()).getSupportActionBar() != null)
+            ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
         ImageView posterImageView = (ImageView) view.findViewById(R.id.movie_poster);
-        ImageView favouriteImageView = (ImageView) view.findViewById(R.id.favourite_image);
+        final ImageView favouriteImageView = (ImageView) view.findViewById(R.id.favourite_image);
         TextView movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
         TextView movieRatingTextView = (TextView) view.findViewById(R.id.rating_text_view);
         TextView movieReleaseTextView = (TextView) view.findViewById(R.id.release_date_text_view);
         TextView movieSynopsisTextView = (TextView) view.findViewById(R.id.plot_synopsis_text_view);
+        for (Movie movie1 : getFavouriteMovies()) {
+            if (movie1.getId() == movie.getId()) {
+                favouriteImageView.setImageResource(R.drawable.fill_01);
+                favourite = true;
+            }
+        }
         favouriteImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ContentValues values = new ContentValues();
-                values.put(MoviesProvider.NAME, movie.getTitle());
-                values.put(MoviesProvider.POSTER, movie.getPosterPath());
-                values.put(MoviesProvider.SYNOPSIS, movie.getOverview());
-                values.put(MoviesProvider.RELEASE_DATE, movie.getReleaseDate());
-                values.put(MoviesProvider.RATING, movie.getVoteAverage() + "");
-                getActivity().getContentResolver().insert(MoviesProvider.CONTENT_URI, values);
+                if (!favourite) {
+                    ContentValues values = new ContentValues();
+                    values.put(MoviesProvider.ID, movie.getId());
+                    values.put(MoviesProvider.NAME, movie.getTitle());
+                    values.put(MoviesProvider.POSTER, movie.getPosterPath());
+                    values.put(MoviesProvider.SYNOPSIS, movie.getOverview());
+                    values.put(MoviesProvider.RELEASE_DATE, movie.getReleaseDate());
+                    values.put(MoviesProvider.RATING, movie.getVoteAverage() + "");
+                    getActivity().getContentResolver().insert(MoviesProvider.CONTENT_URI, values);
+                    favouriteImageView.setImageResource(R.drawable.fill_01);
+                    favourite = true;
+                    Toast.makeText(getContext(), "Added to favourites!", Toast.LENGTH_SHORT).show();
+                } else {
+                    getActivity().getContentResolver().delete(MoviesProvider.CONTENT_URI, MoviesProvider.ID + " = " + movie.getId(), null);
+                    favourite = false;
+                    favouriteImageView.setImageResource(R.drawable.empty_01);
+                    Toast.makeText(getContext(), "Removed from favourites!!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         AppCompatButton appCompatButton = (AppCompatButton) view.findViewById(R.id.reviews_button);
         trailersList = (ListView) view.findViewById(R.id.trailers_list_view);
-        Picasso.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
+        Glide.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
                 .into(posterImageView);
         movieTitleTextView.setText(movie.getTitle());
         movieRatingTextView.setText(movie.getVoteAverage() + "");
@@ -95,35 +142,56 @@ public class MovieDetailsFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-        APIClient.getAPI().getMovieTrailers(movie.getId() + "", new Callback<TrailersModel>() {
-            @Override
-            public void success(TrailersModel trailersModel, Response response) {
-                progressDialog.dismiss();
-                ArrayList<Trailer> trailers = new ArrayList<Trailer>();
-                trailers.addAll(trailersModel.getResults());
-                adapter = new TrailersAdapter(getActivity(), trailers);
-                trailersList.setAdapter(adapter);
-                adapter.notifyDataSetChanged();
-                trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(Constants.YOUTUBE_BASE + adapter.getItem(position).getKey())));
-                    }
-                });
-            }
+        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+            progressDialog.show();
+            APIClient.getAPI().getMovieTrailers(movie.getId() + "", new Callback<TrailersModel>() {
+                @Override
+                public void success(TrailersModel trailersModel, Response response) {
+                    progressDialog.dismiss();
+                    ArrayList<Trailer> trailers = new ArrayList<Trailer>();
+                    trailers.addAll(trailersModel.getResults());
+                    adapter = new TrailersAdapter(getActivity(), trailers);
+                    trailersList.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                    trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(Constants.YOUTUBE_BASE + adapter.getItem(position).getKey())));
+                        }
+                    });
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                progressDialog.dismiss();
-                error.printStackTrace();
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    progressDialog.dismiss();
+                    error.printStackTrace();
+                }
+            });
+        } else {
+            Toast.makeText(getContext(), "Please Connect to the internet to get the latest trailers", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
+    }
+
+    public ArrayList<Movie> getFavouriteMovies() {
+        Cursor cursor = getActivity().getContentResolver().query(MoviesProvider.CONTENT_URI, null, null, null, MoviesProvider.NAME);
+        ArrayList<Movie> movies = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Movie movie = new Movie();
+            movie.setId(cursor.getInt(cursor.getColumnIndexOrThrow(MoviesProvider.ID)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.NAME)));
+            movie.setPosterPath(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.POSTER)));
+            movie.setReleaseDate(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.RELEASE_DATE)));
+            movie.setVoteAverage(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.RATING))));
+            movie.setOverview(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.SYNOPSIS)));
+            movies.add(movie);
+        }
+        return movies;
     }
 }

@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import chipset.potato.Potato;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -55,30 +57,35 @@ public class ReviewsFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.reviews_list);
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
-        progressDialog.show();
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
-        APIClient.getAPI().getMovieReviews(id, new Callback<ReviewsModel>() {
-            @Override
-            public void success(final ReviewsModel reviewsModel, Response response) {
-                ArrayList<Review> reviews = new ArrayList<Review>();
-                reviews.addAll(reviewsModel.getResults());
-                final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), reviews);
-                listView.setAdapter(reviewsAdapter);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        startActivity(new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(reviewsAdapter.getItem(position).getUrl())));
-                    }
-                });
-                progressDialog.dismiss();
-            }
+        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+            progressDialog.show();
+            APIClient.getAPI().getMovieReviews(id, new Callback<ReviewsModel>() {
+                @Override
+                public void success(final ReviewsModel reviewsModel, Response response) {
+                    ArrayList<Review> reviews = new ArrayList<Review>();
+                    reviews.addAll(reviewsModel.getResults());
+                    final ReviewsAdapter reviewsAdapter = new ReviewsAdapter(getActivity(), reviews);
+                    listView.setAdapter(reviewsAdapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            startActivity(new Intent(Intent.ACTION_VIEW,
+                                    Uri.parse(reviewsAdapter.getItem(position).getUrl())));
+                        }
+                    });
+                    progressDialog.dismiss();
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                progressDialog.dismiss();
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    progressDialog.dismiss();
+                }
+
+            });
+        } else {
+            Toast.makeText(getContext(), "Please connect to the internet to get Reviews", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

@@ -26,6 +26,7 @@ public class MoviesProvider extends ContentProvider {
 
     //Columns
     public static final String _ID = "_id";
+    public static final String ID = "id";
     public static final String NAME = "name";
     public static final String POSTER = "poster";
     public static final String RELEASE_DATE = "release";
@@ -45,10 +46,11 @@ public class MoviesProvider extends ContentProvider {
     private SQLiteDatabase db;
     static final String DATABASE_NAME = "MoviesDB";
     static final String MOVIES_TABLE_NAME = "movies";
-    static final int DATABASE_VERSION = 1;
+    static final int DATABASE_VERSION = 2;
     static final String CREATE_DB_TABLE =
             " CREATE TABLE " + MOVIES_TABLE_NAME +
                     " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    ID + " INT NOT NULL, " +
                     NAME + " TEXT NOT NULL, " +
                     SYNOPSIS + " TEXT NOT NULL, " +
                     RATING + " TEXT NOT NULL, " +

@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import sakethkaparthi.moviesapp.R;
 import sakethkaparthi.moviesapp.database.MoviesProvider;
@@ -30,7 +30,7 @@ public class FavouritesCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ImageView imageView = (ImageView) view.findViewById(R.id.movie_poster);
-        Picasso.with(context)
+        Glide.with(context)
                 .load(Constants.IMAGE_BASE_URL + cursor.getString(cursor.getColumnIndex(MoviesProvider.POSTER)))
                 .into(imageView);
     }

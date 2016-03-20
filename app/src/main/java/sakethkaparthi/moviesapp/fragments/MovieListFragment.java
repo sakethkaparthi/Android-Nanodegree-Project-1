@@ -15,9 +15,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import chipset.potato.Potato;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -34,6 +36,7 @@ public class MovieListFragment extends Fragment {
     MovieAdapter movieAdapter;
     ProgressDialog progressDialog;
     GridView gridview;
+    FavouritesCursorAdapter cursorAdapter;
 
     public static MovieListFragment newInstance() {
 
@@ -79,9 +82,13 @@ public class MovieListFragment extends Fragment {
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(true);
-        progressDialog.show();
-        ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
-        sortByPopular();
+        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+            progressDialog.show();
+            sortByPopular();
+        } else {
+            showFavourites();
+            Toast.makeText(getContext(), "Please connect to the internet! ", Toast.LENGTH_SHORT).show();
+        }
     }
 
     void sortByPopular() {
@@ -127,6 +134,17 @@ public class MovieListFragment extends Fragment {
                 movieAdapter = new MovieAdapter(getContext(), movies);
                 gridview.setAdapter(movieAdapter);
                 movieAdapter.notifyDataSetChanged();
+                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        MovieDetailsFragment.movie = movieAdapter.getItem(position);
+                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                        fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    }
+                });
             }
 
             @Override
@@ -139,13 +157,42 @@ public class MovieListFragment extends Fragment {
 
     void showFavourites() {
         Cursor query = getActivity().getContentResolver().query(MoviesProvider.CONTENT_URI, null, null, null, null);
-        FavouritesCursorAdapter cursorAdapter = new FavouritesCursorAdapter(getActivity(), query, 0);
+        cursorAdapter = new FavouritesCursorAdapter(getActivity(), query, 0);
         gridview.setAdapter(cursorAdapter);
+        gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                MovieDetailsFragment.movie = getFavouriteMovies().get(position);
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+        });
     }
 
     @Override
     public void onResume() {
         super.onResume();
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movies");
+        if (cursorAdapter != null)
+            cursorAdapter.notifyDataSetChanged();
+    }
+
+    public ArrayList<Movie> getFavouriteMovies() {
+        Cursor cursor = getActivity().getContentResolver().query(MoviesProvider.CONTENT_URI, null, null, null, MoviesProvider.NAME);
+        ArrayList<Movie> movies = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Movie movie = new Movie();
+            movie.setId(cursor.getInt(cursor.getColumnIndexOrThrow(MoviesProvider.ID)));
+            movie.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.NAME)));
+            movie.setPosterPath(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.POSTER)));
+            movie.setReleaseDate(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.RELEASE_DATE)));
+            movie.setVoteAverage(Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.RATING))));
+            movie.setOverview(cursor.getString(cursor.getColumnIndexOrThrow(MoviesProvider.SYNOPSIS)));
+            movies.add(movie);
+        }
+        return movies;
     }
 }
