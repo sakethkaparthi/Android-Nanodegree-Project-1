@@ -57,7 +57,10 @@ public class MovieDetailsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        return inflater.inflate(R.layout.fragment_movie_details, container, false);
+        if (movie != null)
+            return inflater.inflate(R.layout.fragment_movie_details, container, false);
+        else
+            return inflater.inflate(R.layout.select_movie, container, false);
     }
 
     @Override
@@ -89,87 +92,93 @@ public class MovieDetailsFragment extends Fragment {
         progressDialog.setMessage("Loading...");
         if (((ContainerActivity) getActivity()).getSupportActionBar() != null)
             ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Movie Details");
-        ImageView posterImageView = (ImageView) view.findViewById(R.id.movie_poster);
-        final ImageView favouriteImageView = (ImageView) view.findViewById(R.id.favourite_image);
-        TextView movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
-        TextView movieRatingTextView = (TextView) view.findViewById(R.id.rating_text_view);
-        TextView movieReleaseTextView = (TextView) view.findViewById(R.id.release_date_text_view);
-        TextView movieSynopsisTextView = (TextView) view.findViewById(R.id.plot_synopsis_text_view);
-        for (Movie movie1 : getFavouriteMovies()) {
-            if (movie1.getId() == movie.getId()) {
-                favouriteImageView.setImageResource(R.drawable.fill_01);
-                favourite = true;
-            }
-        }
-        favouriteImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!favourite) {
-                    ContentValues values = new ContentValues();
-                    values.put(MoviesProvider.ID, movie.getId());
-                    values.put(MoviesProvider.NAME, movie.getTitle());
-                    values.put(MoviesProvider.POSTER, movie.getPosterPath());
-                    values.put(MoviesProvider.SYNOPSIS, movie.getOverview());
-                    values.put(MoviesProvider.RELEASE_DATE, movie.getReleaseDate());
-                    values.put(MoviesProvider.RATING, movie.getVoteAverage() + "");
-                    getActivity().getContentResolver().insert(MoviesProvider.CONTENT_URI, values);
+        if (movie != null) {
+            ImageView posterImageView = (ImageView) view.findViewById(R.id.movie_poster);
+            final ImageView favouriteImageView = (ImageView) view.findViewById(R.id.favourite_image);
+            TextView movieTitleTextView = (TextView) view.findViewById(R.id.movie_title);
+            TextView movieRatingTextView = (TextView) view.findViewById(R.id.rating_text_view);
+            TextView movieReleaseTextView = (TextView) view.findViewById(R.id.release_date_text_view);
+            TextView movieSynopsisTextView = (TextView) view.findViewById(R.id.plot_synopsis_text_view);
+            for (Movie movie1 : getFavouriteMovies()) {
+                if (movie1.getId() == movie.getId()) {
                     favouriteImageView.setImageResource(R.drawable.fill_01);
                     favourite = true;
-                    Toast.makeText(getContext(), "Added to favourites!", Toast.LENGTH_SHORT).show();
-                } else {
-                    getActivity().getContentResolver().delete(MoviesProvider.CONTENT_URI, MoviesProvider.ID + " = " + movie.getId(), null);
-                    favourite = false;
-                    favouriteImageView.setImageResource(R.drawable.empty_01);
-                    Toast.makeText(getContext(), "Removed from favourites!!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
-        AppCompatButton appCompatButton = (AppCompatButton) view.findViewById(R.id.reviews_button);
-        trailersList = (ListView) view.findViewById(R.id.trailers_list_view);
-        Glide.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
-                .into(posterImageView);
-        movieTitleTextView.setText(movie.getTitle());
-        movieRatingTextView.setText(movie.getVoteAverage() + "");
-        movieReleaseTextView.setText(movie.getReleaseDate());
-        movieSynopsisTextView.setText(movie.getOverview());
-        appCompatButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-            }
-        });
-        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
-            progressDialog.show();
-            APIClient.getAPI().getMovieTrailers(movie.getId() + "", new Callback<TrailersModel>() {
+            favouriteImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
-                public void success(TrailersModel trailersModel, Response response) {
-                    progressDialog.dismiss();
-                    ArrayList<Trailer> trailers = new ArrayList<Trailer>();
-                    trailers.addAll(trailersModel.getResults());
-                    adapter = new TrailersAdapter(getActivity(), trailers);
-                    trailersList.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-                    trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            startActivity(new Intent(Intent.ACTION_VIEW,
-                                    Uri.parse(Constants.YOUTUBE_BASE + adapter.getItem(position).getKey())));
-                        }
-                    });
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    progressDialog.dismiss();
-                    error.printStackTrace();
+                public void onClick(View v) {
+                    if (!favourite) {
+                        ContentValues values = new ContentValues();
+                        values.put(MoviesProvider.ID, movie.getId());
+                        values.put(MoviesProvider.NAME, movie.getTitle());
+                        values.put(MoviesProvider.POSTER, movie.getPosterPath());
+                        values.put(MoviesProvider.SYNOPSIS, movie.getOverview());
+                        values.put(MoviesProvider.RELEASE_DATE, movie.getReleaseDate());
+                        values.put(MoviesProvider.RATING, movie.getVoteAverage() + "");
+                        getActivity().getContentResolver().insert(MoviesProvider.CONTENT_URI, values);
+                        favouriteImageView.setImageResource(R.drawable.fill_01);
+                        favourite = true;
+                        Toast.makeText(getContext(), "Added to favourites!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        getActivity().getContentResolver().delete(MoviesProvider.CONTENT_URI, MoviesProvider.ID + " = " + movie.getId(), null);
+                        favourite = false;
+                        favouriteImageView.setImageResource(R.drawable.empty_01);
+                        Toast.makeText(getContext(), "Removed from favourites!!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
-        } else {
-            Toast.makeText(getContext(), "Please Connect to the internet to get the latest trailers", Toast.LENGTH_LONG).show();
+            AppCompatButton appCompatButton = (AppCompatButton) view.findViewById(R.id.reviews_button);
+            trailersList = (ListView) view.findViewById(R.id.trailers_list_view);
+            Glide.with(getContext()).load(Constants.IMAGE_BASE_URL + movie.getPosterPath())
+                    .into(posterImageView);
+            movieTitleTextView.setText(movie.getTitle());
+            movieRatingTextView.setText(movie.getVoteAverage() + "");
+            movieReleaseTextView.setText(movie.getReleaseDate());
+            movieSynopsisTextView.setText(movie.getOverview());
+            appCompatButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                    fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                    if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                        fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");
+                    } else {
+                        fragmentTransaction.replace(R.id.details_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");
+                    }
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                }
+            });
+            if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+                progressDialog.show();
+                APIClient.getAPI().getMovieTrailers(movie.getId() + "", new Callback<TrailersModel>() {
+                    @Override
+                    public void success(TrailersModel trailersModel, Response response) {
+                        progressDialog.dismiss();
+                        ArrayList<Trailer> trailers = new ArrayList<Trailer>();
+                        trailers.addAll(trailersModel.getResults());
+                        adapter = new TrailersAdapter(getActivity(), trailers);
+                        trailersList.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
+                        trailersList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                startActivity(new Intent(Intent.ACTION_VIEW,
+                                        Uri.parse(Constants.YOUTUBE_BASE + adapter.getItem(position).getKey())));
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        progressDialog.dismiss();
+                        error.printStackTrace();
+                    }
+                });
+            } else {
+                Toast.makeText(getContext(), "Please Connect to the internet to get the latest trailers", Toast.LENGTH_LONG).show();
+            }
         }
     }
 

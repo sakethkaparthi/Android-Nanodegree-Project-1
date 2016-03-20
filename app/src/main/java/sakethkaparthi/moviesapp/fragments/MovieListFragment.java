@@ -92,67 +92,81 @@ public class MovieListFragment extends Fragment {
     }
 
     void sortByPopular() {
-        APIClient.getAPI().getPopularMovies(new Callback<MoviesModel>() {
-            @Override
-            public void success(MoviesModel moviesModel, Response response) {
-                progressDialog.dismiss();
-                ArrayList<Movie> movies = new ArrayList<Movie>();
-                movies.addAll(moviesModel.getResults());
-                movieAdapter = new MovieAdapter(getContext(), movies);
-                gridview.setAdapter(movieAdapter);
-                movieAdapter.notifyDataSetChanged();
-                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        MovieDetailsFragment.movie = movieAdapter.getItem(position);
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                        fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
-                        fragmentTransaction.addToBackStack(null);
-                        fragmentTransaction.commit();
-                    }
-                });
-            }
+        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+            APIClient.getAPI().getPopularMovies(new Callback<MoviesModel>() {
+                @Override
+                public void success(MoviesModel moviesModel, Response response) {
+                    progressDialog.dismiss();
+                    ArrayList<Movie> movies = new ArrayList<Movie>();
+                    movies.addAll(moviesModel.getResults());
+                    movieAdapter = new MovieAdapter(getContext(), movies);
+                    gridview.setAdapter(movieAdapter);
+                    movieAdapter.notifyDataSetChanged();
+                    gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            MovieDetailsFragment.movie = movieAdapter.getItem(position);
+                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                            if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                                fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                                fragmentTransaction.addToBackStack(null);
+                            } else {
+                                fragmentTransaction.replace(R.id.details_container, MovieDetailsFragment.newInstance());
+                            }
+                            fragmentTransaction.commit();
+                        }
+                    });
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                progressDialog.dismiss();
-                error.printStackTrace();
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    progressDialog.dismiss();
+                    error.printStackTrace();
+                }
+            });
+        } else
+            Toast.makeText(getContext(), "Please connect to the internet!", Toast.LENGTH_SHORT).show();
     }
 
     void sortByRatings() {
-        APIClient.getAPI().getTopRatedMovies(new Callback<MoviesModel>() {
-            @Override
-            public void success(MoviesModel moviesModel, Response response) {
-                progressDialog.dismiss();
-                Log.d("apicall", "success");
-                ArrayList<Movie> movies = new ArrayList<Movie>();
-                movies.addAll(moviesModel.getResults());
-                Log.d("apicall", movies.size() + "");
-                movieAdapter = new MovieAdapter(getContext(), movies);
-                gridview.setAdapter(movieAdapter);
-                movieAdapter.notifyDataSetChanged();
-                gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        MovieDetailsFragment.movie = movieAdapter.getItem(position);
-                        FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                        fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
-                        fragmentTransaction.addToBackStack(null);
-                        fragmentTransaction.commit();
-                    }
-                });
-            }
+        if (Potato.potate(getContext()).Utils().isInternetConnected()) {
+            APIClient.getAPI().getTopRatedMovies(new Callback<MoviesModel>() {
+                @Override
+                public void success(MoviesModel moviesModel, Response response) {
+                    progressDialog.dismiss();
+                    Log.d("apicall", "success");
+                    ArrayList<Movie> movies = new ArrayList<Movie>();
+                    movies.addAll(moviesModel.getResults());
+                    Log.d("apicall", movies.size() + "");
+                    movieAdapter = new MovieAdapter(getContext(), movies);
+                    gridview.setAdapter(movieAdapter);
+                    movieAdapter.notifyDataSetChanged();
+                    gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            MovieDetailsFragment.movie = movieAdapter.getItem(position);
+                            FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                            fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+                            if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                                fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                                fragmentTransaction.addToBackStack(null);
+                            } else {
+                                fragmentTransaction.replace(R.id.details_container, MovieDetailsFragment.newInstance());
+                            }
+                            fragmentTransaction.commit();
+                        }
+                    });
+                }
 
-            @Override
-            public void failure(RetrofitError error) {
-                progressDialog.dismiss();
-                error.printStackTrace();
-            }
-        });
+                @Override
+                public void failure(RetrofitError error) {
+                    progressDialog.dismiss();
+                    error.printStackTrace();
+                }
+            });
+        } else
+            Toast.makeText(getContext(), "Please connect to the internet!", Toast.LENGTH_SHORT).show();
     }
 
     void showFavourites() {
@@ -165,8 +179,12 @@ public class MovieListFragment extends Fragment {
                 MovieDetailsFragment.movie = getFavouriteMovies().get(position);
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
-                fragmentTransaction.addToBackStack(null);
+                if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                    fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
+                    fragmentTransaction.addToBackStack(null);
+                } else {
+                    fragmentTransaction.replace(R.id.details_container, MovieDetailsFragment.newInstance());
+                }
                 fragmentTransaction.commit();
             }
         });
