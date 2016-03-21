@@ -33,8 +33,11 @@ public class ContainerActivity extends AppCompatActivity {
             if (mainFragment instanceof MovieDetailsFragment)
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, MovieDetailsFragment.newInstance())
                         .commit();
-            else
+            else if (mainFragment instanceof ReviewsFragment)
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReviewsFragment.newInstance(id))
+                        .commit();
+            else
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, MovieListFragment.newInstance())
                         .commit();
         }
         if (findViewById(R.id.details_container) != null) {
