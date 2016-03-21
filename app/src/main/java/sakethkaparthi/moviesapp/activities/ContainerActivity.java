@@ -29,7 +29,7 @@ public class ContainerActivity extends AppCompatActivity {
         if (mainFragment == null)
             getSupportFragmentManager().beginTransaction().add(R.id.frame_container, MovieListFragment.newInstance())
                     .commit();
-        else {
+        else if (findViewById(R.id.details_container) == null) {
             if (mainFragment instanceof MovieDetailsFragment)
                 getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, MovieDetailsFragment.newInstance())
                         .commit();
