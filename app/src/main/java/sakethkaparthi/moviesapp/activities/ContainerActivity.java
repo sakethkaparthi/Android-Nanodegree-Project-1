@@ -25,8 +25,18 @@ public class ContainerActivity extends AppCompatActivity {
                         .enableWebKitInspector(
                                 Stetho.defaultInspectorModulesProvider(this))
                         .build());
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, MovieListFragment.newInstance())
-                .commit();
+        Fragment mainFragment = getSupportFragmentManager().findFragmentById(R.id.frame_container);
+        if (mainFragment == null)
+            getSupportFragmentManager().beginTransaction().add(R.id.frame_container, MovieListFragment.newInstance())
+                    .commit();
+        else {
+            if (mainFragment instanceof MovieDetailsFragment)
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, MovieDetailsFragment.newInstance())
+                        .commit();
+            else
+                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, ReviewsFragment.newInstance(id))
+                        .commit();
+        }
         if (findViewById(R.id.details_container) != null) {
             Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.details_container);
             if (currentFragment == null)

@@ -58,7 +58,6 @@ public class ReviewsFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.reviews_list);
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
-        Toast.makeText(getContext(), "Loading reviews", Toast.LENGTH_SHORT).show();
         Log.d("reviews", "fragment active");
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
         if (Potato.potate(getContext()).Utils().isInternetConnected()) {
