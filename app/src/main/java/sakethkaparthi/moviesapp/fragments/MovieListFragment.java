@@ -108,7 +108,7 @@ public class MovieListFragment extends Fragment {
                             MovieDetailsFragment.movie = movieAdapter.getItem(position);
                             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                             fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                            if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                            if (getActivity().findViewById(R.id.details_container) == null) {
                                 fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
                                 fragmentTransaction.addToBackStack(null);
                             } else {
@@ -148,7 +148,7 @@ public class MovieListFragment extends Fragment {
                             MovieDetailsFragment.movie = movieAdapter.getItem(position);
                             FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                             fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                            if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                            if (getActivity().findViewById(R.id.details_container) == null) {
                                 fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
                                 fragmentTransaction.addToBackStack(null);
                             } else {
@@ -179,7 +179,7 @@ public class MovieListFragment extends Fragment {
                 MovieDetailsFragment.movie = getFavouriteMovies().get(position);
                 FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                if (getActivity().findViewById(R.id.details_container) == null) {
                     fragmentTransaction.replace(R.id.frame_container, MovieDetailsFragment.newInstance());
                     fragmentTransaction.addToBackStack(null);
                 } else {

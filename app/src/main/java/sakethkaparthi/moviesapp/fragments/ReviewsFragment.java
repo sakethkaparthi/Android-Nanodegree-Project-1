@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,8 @@ public class ReviewsFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.reviews_list);
         final ProgressDialog progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Loading...");
+        Toast.makeText(getContext(), "Loading reviews", Toast.LENGTH_SHORT).show();
+        Log.d("reviews", "fragment active");
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
         if (Potato.potate(getContext()).Utils().isInternetConnected()) {
             progressDialog.show();
@@ -94,5 +97,11 @@ public class ReviewsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((ContainerActivity) getActivity()).getSupportActionBar().setTitle("Reviews");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ContainerActivity.id = id;
     }
 }

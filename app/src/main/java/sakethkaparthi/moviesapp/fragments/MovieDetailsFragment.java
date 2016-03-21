@@ -65,6 +65,7 @@ public class MovieDetailsFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        menu.removeItem(R.id.action_share);
         inflater.inflate(R.menu.movie_details_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
@@ -152,7 +153,7 @@ public class MovieDetailsFragment extends Fragment {
                 public void onClick(View v) {
                     FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                     fragmentTransaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-                    if (getActivity().findViewById(R.id.movie_list_fragment) == null) {
+                    if (getActivity().findViewById(R.id.details_container) == null) {
                         fragmentTransaction.replace(R.id.frame_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");
                     } else {
                         fragmentTransaction.replace(R.id.details_container, ReviewsFragment.newInstance(movie.getId() + ""), "Reviews");

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frame_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     tools:context="sakethkaparthi.moviesapp.activities.ContainerActivity">
 
-    <fragment
-        android:id="@+id/movie_list_fragment"
-        android:name="sakethkaparthi.moviesapp.fragments.MovieListFragment"
+    <FrameLayout
+        android:id="@+id/frame_container"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="40" />
+        android:layout_weight="40">
+
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/details_container"
@@ -20,10 +20,5 @@
         android:layout_height="match_parent"
         android:layout_weight="60">
 
-        <fragment
-            android:id="@+id/movie_details_fragment"
-            android:name="sakethkaparthi.moviesapp.fragments.MovieDetailsFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
     </FrameLayout>
 </LinearLayout>

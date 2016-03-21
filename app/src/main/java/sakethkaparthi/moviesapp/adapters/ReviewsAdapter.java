@@ -17,10 +17,12 @@ import sakethkaparthi.moviesapp.models.Review;
 public class ReviewsAdapter extends BaseAdapter {
     Activity mActivity;
     ArrayList<Review> reviewArrayList;
-    public ReviewsAdapter(Activity activity, ArrayList<Review> reviews){
+
+    public ReviewsAdapter(Activity activity, ArrayList<Review> reviews) {
         mActivity = activity;
         reviewArrayList = reviews;
     }
+
     @Override
     public int getCount() {
         return reviewArrayList.size();
@@ -38,12 +40,15 @@ public class ReviewsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if(convertView==null){
-                convertView = mActivity.getLayoutInflater().inflate(R.layout.review_list_item,parent,false);
+        if (convertView == null) {
+            convertView = mActivity.getLayoutInflater().inflate(R.layout.review_list_item, parent, false);
         }
-        ((TextView)convertView.findViewById(R.id.review_content)).setText(getItem(position).getContent().substring(0,100)
-        +"...Click here to see more");
-        ((TextView)convertView.findViewById(R.id.review_author)).setText(getItem(position).getAuthor());
+        if (getItem(position).getContent().length() >= 100)
+            ((TextView) convertView.findViewById(R.id.review_content)).setText(getItem(position).getContent().substring(0, 100)
+                    + "...Click here to see more");
+        else
+            ((TextView) convertView.findViewById(R.id.review_content)).setText(getItem(position).getContent());
+        ((TextView) convertView.findViewById(R.id.review_author)).setText(getItem(position).getAuthor());
         return convertView;
     }
 }
