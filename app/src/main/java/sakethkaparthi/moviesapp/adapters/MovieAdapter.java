@@ -7,12 +7,12 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.R;
+import sakethkaparthi.moviesapp.models.Movie;
 import sakethkaparthi.moviesapp.resources.Constants;
 
 /**
@@ -48,7 +48,7 @@ public class MovieAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.movie_grid_item, parent, false);
         }
         ImageView imageView = (ImageView) convertView.findViewById(R.id.movie_poster);
-        Picasso.with(mContext).load(Constants.IMAGE_BASE_URL+movieArrayList.get(position).getPosterPath()).into(imageView);
+        Glide.with(mContext).load(Constants.IMAGE_BASE_URL+movieArrayList.get(position).getPosterPath()).into(imageView);
         return convertView;
     }
 }

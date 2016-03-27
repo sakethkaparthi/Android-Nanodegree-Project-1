@@ -6,5 +6,6 @@ package sakethkaparthi.moviesapp.resources;
 public class Constants {
     public static final String BASE_URL="http://api.themoviedb.org/3" ;
     public static final String IMAGE_BASE_URL="http://image.tmdb.org/t/p/w185/";
-    public static final String API_KEY = "YOUR KEY";
+    public static final String API_KEY = "YOUR KEY HERE";
+    public static final String YOUTUBE_BASE = "https://www.youtube.com/watch?v=";
 }
